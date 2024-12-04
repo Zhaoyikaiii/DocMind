@@ -1,0 +1,7 @@
+server:
+  port: "8080"
+  mode: "debug"  # 可选：debug, release
+
+logging:
+  level: "info"  # debug, info, warn, error
+  output: "console,file"

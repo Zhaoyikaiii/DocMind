@@ -11,10 +11,12 @@ erDiagram
     User ||--o{ Document : creates
     User ||--o{ DocumentVersion : creates
     User ||--o{ UserSettings : has
+    User ||--o{ File : uploads
     Document ||--o{ DocumentVersion : has
     Document }|--|| User : owned_by
     Document }o--o{ Tag : has
     Document ||--o{ Document : has_parent
+    Document ||--o{ File : has
 
 ```
 
@@ -120,3 +122,54 @@ CREATE TABLE document_tags (
     FOREIGN KEY (tag_id) REFERENCES tags(id)
 );
 ```
+
+## Files Table
+Stores file metadata and upload information.
+
+```sql
+CREATE TABLE files (
+    id SERIAL PRIMARY KEY,
+    original_name VARCHAR(255) NOT NULL,
+    storage_name VARCHAR(255) NOT NULL UNIQUE,
+    path VARCHAR(512) NOT NULL,
+    size BIGINT NOT NULL,
+    content_type VARCHAR(128),
+    uploader_id INTEGER NOT NULL,
+    document_id INTEGER,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    FOREIGN KEY (uploader_id) REFERENCES users(id),
+    FOREIGN KEY (document_id) REFERENCES documents(id)
+);
+```
+
+## Table Relationships
+
+1. Files and Users:
+   - Each file must have an uploader (user)
+   - One user can upload many files
+   - Relationship enforced by `uploader_id` foreign key
+
+2. Files and Documents:
+   - Files can optionally be associated with a document
+   - One document can have multiple files
+   - Relationship enforced by `document_id` foreign key
+
+## Key Features
+
+1. File Storage:
+   - Original filename preservation (`original_name`)
+   - Unique storage name to prevent conflicts (`storage_name`)
+   - Full file path for retrieval (`path`)
+   - File size tracking (`size`)
+   - Content type recording (`content_type`)
+
+2. Relationships:
+   - User tracking through `uploader_id`
+   - Optional document association through `document_id`
+
+3. Timestamps:
+   - Creation time tracking
+   - Update time tracking
+   - Soft delete support

@@ -12,6 +12,7 @@ type DocumentRepository interface {
 	Delete(ctx context.Context, id uint) error
 	GetByID(ctx context.Context, id uint) (*models.Document, error)
 	List(ctx context.Context, params DocumentListParams) ([]models.Document, int64, error)
+	ExistsByTitleAndCreator(ctx context.Context, title string, creatorID uint) (bool, error)
 	CreateVersion(ctx context.Context, version *models.DocumentVersion) error
 	GetVersions(ctx context.Context, documentID uint) ([]models.DocumentVersion, error)
 	AddTags(ctx context.Context, docID uint, tagIDs []uint) error
@@ -122,4 +123,12 @@ func (r *documentRepository) RemoveTags(ctx context.Context, docID uint, tagIDs 
 		Table("document_tags").
 		Where("document_id = ? AND tag_id IN ?", docID, tagIDs).
 		Delete(nil).Error
+}
+
+func (r *documentRepository) ExistsByTitleAndCreator(ctx context.Context, title string, creatorID uint) (bool, error) {
+	var count int64
+	err := r.db.WithContext(ctx).Model(&models.Document{}).
+		Where("title = ? AND creator_id = ?", title, creatorID).
+		Count(&count).Error
+	return count > 0, err
 }

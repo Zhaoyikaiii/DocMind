@@ -7,6 +7,11 @@ import (
 	"github.com/Zhaoyikaiii/docmind/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"github.com/Zhaoyikaiii/docmind/internal/service"
+	"github.com/Zhaoyikaiii/docmind/internal/interfaces"
+	"github.com/Zhaoyikaiii/docmind/internal/storage"
+	"github.com/Zhaoyikaiii/docmind/internal/storage/operators"
+	"fmt"
 )
 
 func setupRouter() *gin.Engine {
@@ -42,6 +47,32 @@ func setupRouter() *gin.Engine {
 	}
 
 	return r
+}
+
+func setupFileOperator(cfg *config.Config) (interfaces.FileOperator, error) {
+	switch cfg.Storage.Type {
+	case "local":
+		return storage.NewFileOperator(storage.Local, operators.LocalConfig{
+			UploadDir:    cfg.Storage.LocalPath,
+			MaxFileSize:  cfg.Storage.MaxFileSize,
+			AllowedTypes: cfg.Storage.AllowedTypes,
+		})
+
+	case "oss":
+		return storage.NewFileOperator(storage.OSS, operators.OSSConfig{
+			Endpoint:        cfg.OSS.Endpoint,
+			AccessKeyID:     cfg.OSS.AccessKeyID,
+			AccessKeySecret: cfg.OSS.AccessKeySecret,
+				BucketName:      cfg.OSS.BucketName,
+				BasePath:        cfg.OSS.BasePath,
+				MaxFileSize:     cfg.OSS.MaxFileSize,
+				AllowedTypes:    cfg.OSS.AllowedTypes,
+		})
+
+	// ... 其他存储类型的配置
+	}
+
+	return nil, fmt.Errorf("unsupported storage type: %s", cfg.Storage.Type)
 }
 
 func main() {

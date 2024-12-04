@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
+
 	"github.com/Zhaoyikaiii/docmind/internal/models"
 	"github.com/Zhaoyikaiii/docmind/internal/repository"
 )
@@ -27,6 +29,15 @@ func NewDocumentService(repo repository.DocumentRepository) DocumentService {
 }
 
 func (s *documentService) CreateDocument(ctx context.Context, doc *models.Document) error {
+	// 先检查是否存在相同标题的文档
+	exists, err := s.repo.ExistsByTitleAndCreator(ctx, doc.Title, doc.CreatorID)
+	if err != nil {
+		return fmt.Errorf("failed to check document existence: %w", err)
+	}
+	if exists {
+		return fmt.Errorf("document with this title already exists")
+	}
+	
 	return s.repo.Create(ctx, doc)
 }
 

@@ -8,11 +8,11 @@ import (
 
 type Document struct {
 	ID        uint           `gorm:"primarykey" json:"id"`
-	Title     string         `gorm:"size:255;not null" json:"title"`
+	Title     string         `gorm:"size:255;not null;uniqueIndex:idx_title_creator" json:"title"`
 	Content   string         `gorm:"type:text" json:"content"`
 	Version   int            `gorm:"default:1" json:"version"`
 	Status    string         `gorm:"size:20;default:'draft'" json:"status"` // draft, published, archived
-	CreatorID uint           `gorm:"not null" json:"creator_id"`
+	CreatorID uint           `gorm:"not null;uniqueIndex:idx_title_creator" json:"creator_id"`
 	Creator   User           `gorm:"foreignKey:CreatorID" json:"creator"`
 	ParentID  *uint          `gorm:"default:null" json:"parent_id"`
 	Path      string         `gorm:"size:255" json:"path"`

@@ -20,3 +20,7 @@ func LoadConfig() {
 func GetString(key string) string {
 	return viper.GetString(key)
 }
+
+func GetInt64(key string) int64 {
+	return viper.GetInt64(key)
+}

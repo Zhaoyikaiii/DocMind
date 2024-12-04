@@ -5,3 +5,8 @@ server:
 logging:
   level: "info"  # debug, info, warn, error
   output: "console,file"
+  
+jwt:
+  secret: "your-secret-key-here" # 在生产环境中应该使用环境变量
+  access_expiration: 15    # 15 minutes
+  refresh_expiration: 7    # 7 days

@@ -1,0 +1,4 @@
+jwt:
+  secret: "test-secret-key-for-testing"
+  access_expiration: 15    # 15 minutes
+  refresh_expiration: 7    # 7 days

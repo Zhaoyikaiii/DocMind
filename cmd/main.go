@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Zhaoyikaiii/docmind/internal/api/controllers"
 	"github.com/Zhaoyikaiii/docmind/internal/api/middleware"
 	"github.com/Zhaoyikaiii/docmind/pkg/config"
 	"github.com/Zhaoyikaiii/docmind/pkg/utils"
@@ -10,23 +11,32 @@ import (
 
 func setupRouter() *gin.Engine {
 	r := gin.New()
-
 	middleware.ApplyMiddleware(r)
 
+	// Public routes
 	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message":    "pong",
-			"request_id": c.GetString("RequestID"),
-		})
+		c.JSON(200, gin.H{"message": "pong"})
 	})
 
-	authorized := r.Group("/api")
-	authorized.Use(middleware.NewMiddleware().Auth)
+	// Auth routes
+	authController := &controllers.AuthController{}
+	auth := r.Group("/auth")
 	{
-		authorized.GET("/protected", func(c *gin.Context) {
+		auth.POST("/login", authController.Login)
+		auth.POST("/refresh", authController.RefreshToken)
+	}
+
+	// Protected routes
+	api := r.Group("/api")
+	api.Use(middleware.AuthMiddleware())
+	{
+		api.GET("/protected", func(c *gin.Context) {
+			userID, _ := c.Get("userID")
+			username, _ := c.Get("username")
 			c.JSON(200, gin.H{
-				"message":    "You have access to protected resource",
-				"request_id": c.GetString("RequestID"),
+				"message":  "You have access to protected resource",
+				"user_id":  userID,
+				"username": username,
 			})
 		})
 	}

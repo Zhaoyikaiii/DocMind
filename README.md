@@ -32,6 +32,15 @@ DocMind is an intelligent document analysis and question-answering system built 
 
 This document outlines the key milestones for the DocMind project, an intelligent document analysis and question-answering system. Each milestone represents a significant phase in the project's development lifecycle.
 
+## Database Setup
+
+The project uses PostgreSQL running in Docker. To start the database:
+
+```bash
+# Build and start the PostgreSQL container
+docker-compose up -d postgres
+```
+
 ## Milestone 1: Infrastructure Setup
 
 **Target Completion: [Date]**
